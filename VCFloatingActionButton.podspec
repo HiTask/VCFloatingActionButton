@@ -17,7 +17,8 @@ Pod::Spec.new do |s|
 
   s.source       = { :git => "https://github.com/nartex/VCFloatingActionButton.git", :tag => s.version.to_s }
 
-  s.source_files  = "VCFloatingActionButton", "VCFloatingActionButton/*.{h,m,xib}"
+  s.resources    = "VCFloatingActionButton/*.xib"
+  s.source_files  = "VCFloatingActionButton", "VCFloatingActionButton/*.{h,m}"
 
   s.requires_arc = true
   
