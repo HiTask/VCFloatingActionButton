@@ -24,6 +24,11 @@
 
 @property (nonatomic) BOOL hideWhileScrolling;
 
+@property (strong,nonatomic) UIColor *mainButtonColor;
+@property (strong,nonatomic) UIColor *secondaryButtonsColor;
+@property (assign,nonatomic) CGFloat secondaryButtonRatio;
+@property (strong,nonatomic) UIFont *buttonsRowsFont;
+
 
 @property (strong,nonatomic) UIView *bgView;
 @property (strong,nonatomic) UIScrollView *bgScroller;

@@ -29,19 +29,32 @@ CGFloat buttonToScreenHeight;
 -(id)initWithFrame:(CGRect)frame normalImage:(UIImage*)passiveImage andPressedImage:(UIImage*)activeImage withScrollview:(UIScrollView*)scrView
 {
     self = [super initWithFrame:frame];
-    if (self)
-    {
+    if (self) {
+        // Initial params
+        _mainButtonColor = [UIColor colorWithRed:0.000 green:0.502 blue:1.000 alpha:1.000];
+        _secondaryButtonRatio = 0.75;
+        _secondaryButtonsColor = [UIColor colorWithWhite:0.902 alpha:1.000];
+        
         windowView = [[UIView alloc]initWithFrame:[UIScreen mainScreen].bounds];
+        windowView.autoresizingMask =  UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
         _mainWindow = [UIApplication sharedApplication].keyWindow;
         _buttonView = [[UIView alloc]initWithFrame:frame];
         _buttonView.backgroundColor = [UIColor clearColor];
         _buttonView.userInteractionEnabled = YES;
-
+        _buttonView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
+        _buttonView.layer.masksToBounds = NO;
+        _buttonView.layer.backgroundColor = self.mainButtonColor.CGColor;
+        _buttonView.layer.cornerRadius = frame.size.height / 2;
+        _buttonView.layer.shadowColor = [UIColor blackColor].CGColor;
+        _buttonView.layer.shadowOpacity = 1.0;
+        _buttonView.layer.shadowRadius = 7.0;
+        _buttonView.layer.shadowOffset = CGSizeMake(0, 4);
+        
         buttonToScreenHeight = SCREEN_HEIGHT - CGRectGetMaxY(self.frame);
         
-        _menuTable = [[UITableView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH/4, 0, 0.75*SCREEN_WIDTH,SCREEN_HEIGHT - (SCREEN_HEIGHT - CGRectGetMaxY(self.frame)) )];
+        _menuTable = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - (SCREEN_HEIGHT - CGRectGetMaxY(self.frame)) )];
+        _menuTable.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
         _menuTable.scrollEnabled = NO;
-        
         
         _menuTable.tableHeaderView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH/2, CGRectGetHeight(frame))];
         
@@ -58,6 +71,7 @@ CGFloat buttonToScreenHeight;
         _pressedImage = activeImage;
         _normalImage = passiveImage;
         [self setupButton];
+        
         
     }
     return self;
@@ -102,6 +116,7 @@ CGFloat buttonToScreenHeight;
     _bgView = [[UIView alloc]initWithFrame:[UIScreen mainScreen].bounds];
     _bgView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
     _bgView.alpha = 0;
+    _bgView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _bgView.userInteractionEnabled = YES;
     UITapGestureRecognizer *buttonTap2 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(handleTap:)];
 
@@ -113,15 +128,19 @@ CGFloat buttonToScreenHeight;
     
     _normalImageView = [[UIImageView alloc]initWithFrame:self.bounds];
     _normalImageView.userInteractionEnabled = YES;
-    _normalImageView.contentMode = UIViewContentModeScaleAspectFit;
-    _normalImageView.layer.shadowColor = [UIColor blackColor].CGColor;
-    _normalImageView.layer.shadowRadius = 5.f;
-    _normalImageView.layer.shadowOffset = CGSizeMake(-10, -10);
-
-
+    _normalImageView.contentMode = UIViewContentModeCenter;
     
-    _pressedImageView  = [[UIImageView alloc]initWithFrame:self.bounds];
-    _pressedImageView.contentMode = UIViewContentModeScaleAspectFit;
+    _normalImageView.backgroundColor = [UIColor clearColor];
+    _normalImageView.layer.masksToBounds = NO;
+    _normalImageView.layer.backgroundColor = self.mainButtonColor.CGColor;
+    _normalImageView.layer.cornerRadius = _normalImageView.frame.size.height / 2;
+    _normalImageView.layer.shadowColor = [UIColor blackColor].CGColor;
+    _normalImageView.layer.shadowOpacity = 1.0;
+    _normalImageView.layer.shadowRadius = 7.0;
+    _normalImageView.layer.shadowOffset = CGSizeMake(0, 4);
+    
+    _pressedImageView = [[UIImageView alloc]initWithFrame:self.bounds];
+    _pressedImageView.contentMode = UIViewContentModeCenter;
     _pressedImageView.userInteractionEnabled = YES;
     
     
@@ -137,6 +156,12 @@ CGFloat buttonToScreenHeight;
 
 }
 
+- (void)setMainButtonColor:(UIColor *)mainButtonColor {
+    _mainButtonColor = mainButtonColor;
+    _buttonView.layer.backgroundColor = mainButtonColor.CGColor;
+    _normalImageView.layer.backgroundColor = mainButtonColor.CGColor;
+}
+
 -(void)handleTap:(id)sender //Show Menu
 {
 
@@ -149,9 +174,17 @@ CGFloat buttonToScreenHeight;
     else
     {
         [windowView addSubview:_bgView];
+        _bgView.translatesAutoresizingMaskIntoConstraints = NO;
+        windowView.translatesAutoresizingMaskIntoConstraints = NO;
+        [windowView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[v]-0-|" options:0 metrics:nil views:@{@"v":_bgView}]];
+        [windowView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[v]-0-|" options:0 metrics:nil views:@{@"v":_bgView}]];
+        
         [windowView addSubview:_buttonView];
         
         [_mainWindow addSubview:windowView];
+        
+        [_mainWindow addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[v]-0-|" options:0 metrics:nil views:@{@"v":windowView}]];
+        [_mainWindow addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[v]-0-|" options:0 metrics:nil views:@{@"v":windowView}]];
         [self showMenu:nil];
     }
     _isMenuVisible  = !_isMenuVisible;
@@ -340,21 +373,28 @@ CGFloat buttonToScreenHeight;
 {
     NSString *identifier = @"cell";
     floatTableViewCell *cell = [_menuTable dequeueReusableCellWithIdentifier:identifier];
-    if (!cell)
-    {
+    if (!cell) {
         [_menuTable registerNib:[UINib nibWithNibName:@"floatTableViewCell" bundle:nil]forCellReuseIdentifier:identifier];
         cell = [_menuTable dequeueReusableCellWithIdentifier:identifier];
     }
     
-//    NSLog(@"%@",[_menuItemSet allKeys]);
-//    NSLog(@"%@",[_menuItemSet allValues]);
-    
-//    cell.imgView.image = [UIImage imageNamed:[[_menuItemSet allKeys]objectAtIndex:indexPath.row]];
-//        cell.title.text = [[_menuItemSet allValues]objectAtIndex:indexPath.row];
-    
     cell.imgView.image = [UIImage imageNamed:[_imageArray objectAtIndex:indexPath.row]];
+    cell.imgViewHeightConstraint.constant = _normalImageView.frame.size.height * self.secondaryButtonRatio;
+    cell.imgViewWidthConstraint.constant = _normalImageView.frame.size.width * self.secondaryButtonRatio;
+    cell.imgView.backgroundColor = [UIColor clearColor];
+    cell.imgView.layer.backgroundColor = self.secondaryButtonsColor.CGColor;
+    cell.imgView.contentMode = UIViewContentModeCenter;
+    cell.imgView.layer.masksToBounds = NO;
+    cell.imgView.layer.cornerRadius = cell.imgViewHeightConstraint.constant / 2;
+    cell.imgView.layer.shadowColor = [UIColor blackColor].CGColor;
+    cell.imgView.layer.shadowOpacity = 0.7;
+    cell.imgView.layer.shadowRadius = 7.0;
+    cell.imgView.layer.shadowOffset = CGSizeMake(0, 4);
+    
     cell.title.text    = [_labelArray objectAtIndex:indexPath.row];
-
+    if (self.buttonsRowsFont) {
+        cell.title.font = self.buttonsRowsFont;
+    }
     
     return cell;
 }
