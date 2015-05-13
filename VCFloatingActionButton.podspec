@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/nartex/VCFloatingActionButton"
   s.screenshots  = ""
 
-  s.license      = { :type => "MIT", :file => "LICENSE.txt" }
+  s.license      = { :type => "MIT", :file => "LICENSE" }
 
   s.author             = "gizmoboy7"
   s.social_media_url   = ""
