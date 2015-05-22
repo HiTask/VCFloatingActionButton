@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "VCFloatingActionButton"
-  s.version      = "1.1"
+  s.version      = "1.1.1"
   s.summary      = "VCFloatingActionButton like Inbox floating button"
 
   s.homepage     = "https://github.com/nartex/VCFloatingActionButton"
