@@ -12,6 +12,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imgView;
 @property (weak, nonatomic) IBOutlet UILabel *title;
 @property (strong,nonatomic) UIView *overlay;
--(void)setTitle:(NSString*)txt andImage:(UIImage*)img;
+@property (unsafe_unretained, nonatomic) IBOutlet NSLayoutConstraint *imgViewWidthConstraint;
+@property (unsafe_unretained, nonatomic) IBOutlet NSLayoutConstraint *imgViewHeightConstraint;
 
 @end
